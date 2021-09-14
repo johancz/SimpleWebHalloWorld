@@ -27,7 +27,7 @@ jobs:
   build-and-push-docker-image:
     runs-on: ubuntu-latest
     env: 
-      working-directory: ./
+      working-directory: .
     steps:
     - name: Checkout code
       uses: actions/checkout@v2.3.4
