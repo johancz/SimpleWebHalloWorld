@@ -23,3 +23,32 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+
+  build-and-push-docker-image:
+    runs-on: ubuntu-latest
+    env: 
+      working-directory: ./Source
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2.3.4
+    - name: Docker metadata
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        # images: johancz/SimpleWebHalloWorld
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1.10.0
+      with:
+         registry: ghcr.io
+         username: ${{ github.actor }};
+         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push
+      id: docker_build
+      uses: docker/build-push-action@v2.7.0
+      with:
+        push: true
+        context: ${ {env.working-directory} }
+        tags: |
+          ghcr.io/johancz/SimpleWebHalloWorld:latest
+          ghcr.io/johancz/SimpleWebHalloWorld:${{ github.run_number }}
