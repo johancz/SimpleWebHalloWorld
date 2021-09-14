@@ -48,7 +48,7 @@ jobs:
       uses: docker/build-push-action@v2.7.0
       with:
         push: true
-        context: ${ {env.working-directory} }
+        context: ${{env.working-directory}}
         tags: |
           ghcr.io/johancz/simplewebhalloworld:latest
           ghcr.io/johancz/simplewebhalloworld:${{ github.run_number }}
