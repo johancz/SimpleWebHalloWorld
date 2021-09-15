@@ -34,13 +34,6 @@ jobs:
     # This task checks-out the repository so that the workflow can access it. 
     - name: Checkout code
       uses: actions/checkout@v2.3.4
-    # TODO: maybe remove this task
-    - name: Docker metadata
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        # images: johancz/simplewebhalloworld
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     # Login to GitHub Container Registry (GHCR) (with the login action by Docker).
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1.10.0
