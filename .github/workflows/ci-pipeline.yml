@@ -8,7 +8,7 @@ on:
     branches: [ master ]
 
 jobs:
-  # Build and test the app. This was described in detail in my blog post for the 2nd exercise of this course, see here: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/09/exercise-2-Continuous-Integration#my-github-actions-workflow-yaml-file
+  # Build and test the app. This job was described in detail in my blog post for the 2nd exercise of this course, see here: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/09/exercise-2-Continuous-Integration#my-github-actions-workflow-yaml-file
   build:
     runs-on: ubuntu-latest
     steps:
@@ -42,14 +42,14 @@ jobs:
         registry: ghcr.io
         # Set authentication information:
         # Set username, the username in this case is my Github username (specified with "github.actor").
-        username: ${{ github.actor }};
+        username: ${{ github.actor }}
         # And the password is set with "secrets.GITHUB_TOKEN" (which is a token automatically provided by Github which can be used on this (and only this repository).
         password: ${{ secrets.GITHUB_TOKEN }}
     # Login to Docker Hub (with the login action by Docker).
     - name: Log in to Docker Hub
       uses: docker/login-action@v1.10.0
       with:
-        registry: docker.io
+        registry: docker.io # This is unnecessary since it defaults to Docker's registry unless specified.
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     # The build and push task makes use of Docker's build-push action. This task builds an image and pushes it to GHCR.
@@ -62,8 +62,9 @@ jobs:
         # Set the build context.
         context: ${{env.working-directory}}
         # Specify the registries we want to push our image to and set a "version tag" (e.g. "latest" or "9").
+        # The format is: "registry/namespace/repository:version" (in my case the namespace on both registries is my username "johancz")
         tags: |
           ghcr.io/johancz/simplewebhalloworld:latest
-          ghcr.io/johancz/simplewebhalloworld:${{ github.run_number }}
+          ghcr.io/johancz/simplewebhalloworld:$\$${{ github.run_number }}
           docker.io/johancz/simplewebhalloworld:latest
-          docker.io/johancz/simplewebhalloworld:${{ github.run_number }}
+          docker.io/johancz/simplewebhalloworld:$\$${{ github.run_number }}
