@@ -1,5 +1,6 @@
 name: .NET
 
+# Trigger the workflow whenever something is pushed to the 'master' branch or a "pull_request" event occurs (for more on what a "pull_request" event is and its activity types see here: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request)
 on:
   push:
     branches: [ master ]
@@ -7,10 +8,9 @@ on:
     branches: [ master ]
 
 jobs:
+  # Build and test the app. This was described in detail in my blog post for the 2nd exercise of this course, see here: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/09/exercise-2-Continuous-Integration#my-github-actions-workflow-yaml-file
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -24,31 +24,44 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
+  # The jobs which builds and pushes our images to two repositories, Github's container repository (GHCR) and Docker Hub.
   build-and-push-docker-image:
     runs-on: ubuntu-latest
-    env: 
+    env:
+      # Set the default working directory for all "run" steps on this workflow.
       working-directory: .
     steps:
+    # This task checks-out the repository so that the workflow can access it. 
     - name: Checkout code
       uses: actions/checkout@v2.3.4
+    # TODO: maybe remove this task
     - name: Docker metadata
       id: meta
       uses: docker/metadata-action@v3
       with:
         # images: johancz/simplewebhalloworld
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    # Login to GitHub Container Registry (GHCR) with the login action by Docker
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1.10.0
       with:
+         # Specify the registry we want to push to.
          registry: ghcr.io
+         # Set authentication information:
+         # Set username, the username in this case is my Github username (specified with "github.actor").
          username: ${{ github.actor }};
+         # And the password is set with "secrets.GITHUB_TOKEN" (which is a token automatically provided by Github which can be used on this (and only this repository).
          password: ${{ secrets.GITHUB_TOKEN }}
+    # The build and push task makes use of Docker's build-push action. This task builds an image and pushes it to GHCR.
     - name: Build and push
       id: docker_build
+      # Here I specify to use Docker's build-push action, 
       uses: docker/build-push-action@v2.7.0
       with:
         push: true
+        # Set the build context.
         context: ${{env.working-directory}}
+        # Specify the registries we want to push our image to and set a "version tag" (e.g. "latest" or "9").
         tags: |
           ghcr.io/johancz/simplewebhalloworld:latest
           ghcr.io/johancz/simplewebhalloworld:${{ github.run_number }}
