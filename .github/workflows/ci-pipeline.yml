@@ -65,6 +65,6 @@ jobs:
         # The format is: "registry/namespace/repository:version" (in my case the namespace on both registries is my username "johancz")
         tags: |
           ghcr.io/johancz/simplewebhalloworld:latest
-          ghcr.io/johancz/simplewebhalloworld:$\$${{ github.run_number }}
+          ghcr.io/johancz/simplewebhalloworld:${{ github.run_number }}
           docker.io/johancz/simplewebhalloworld:latest
-          docker.io/johancz/simplewebhalloworld:$\$${{ github.run_number }}
+          docker.io/johancz/simplewebhalloworld:${{ github.run_number }}
